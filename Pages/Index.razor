@@ -1,0 +1,44 @@
+﻿@page "/"
+@using BaseStation.Models
+
+
+<h1>Show Cell Information</h1>
+
+
+    <MapView Class="map-view"
+             Zoom="7.5"
+             Style="width:100%; height:100vh">
+        <WebMap>
+        <PortalItem Id="395a872338aa4767a66065d17eacbc26" />
+            @if (gps != null)
+            {
+                <GraphicsLayer>
+                        <Graphic>
+                            <PictureMarkerSymbol Url="https://img.icons8.com/ios-filled/50/visit.png" Width="32" Height="32" />
+                            <Point Longitude="@gps.Longitude" Latitude="@gps.Latitude" />
+                        </Graphic>
+                </GraphicsLayer>
+            }
+        </WebMap>
+        <ScaleBarWidget Position="OverlayPosition.BottomLeft" />
+        <LegendWidget Position="OverlayPosition.TopRight" />
+    </MapView>
+
+
+@code {
+    private List<CellInfor> CellInforList = null;
+    private GPS gps = null;
+
+    protected override async void OnInitialized()
+    {
+#if ANDROID
+    var CellService = new BaseStation.CellInformationService();
+    CellInforList = await CellService.GetCellInfos();
+    gps = await CellService.GetGPS();
+
+    StateHasChanged();
+#endif
+
+    }
+}
+
