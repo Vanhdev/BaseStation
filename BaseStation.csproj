@@ -51,6 +51,7 @@
 
     <ItemGroup>
       <Content Remove="appsettings.json" />
+      <Content Remove="wwwroot\Images\base-station-icon.svg" />
     </ItemGroup>
 
     <ItemGroup>
@@ -64,16 +65,13 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Update="wwwroot\appsettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="wwwroot\Images\" />
     </ItemGroup>
 
 </Project>

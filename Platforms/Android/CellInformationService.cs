@@ -86,6 +86,13 @@ namespace BaseStation
             foreach (CellInfo cellInfo in CellInfoList)
             {
                 CellInfor bs = bindData(cellInfo);
+                var service = new Services.BaseStationServices();
+                dynamic res = await service.GetLocation(bs);
+                if (res is not null && res.status == "ok")
+                {
+                    bs.SetLat(res.lat);
+                    bs.SetLon(res.lon);
+                }
                 CellList.Add(bs);
             }
             return CellList;

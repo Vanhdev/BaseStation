@@ -1,44 +1,129 @@
 ﻿@page "/"
 @using BaseStation.Models
+@inject BaseStation.Services.BaseStationServices service
 
 
 <h1>Show Cell Information</h1>
 
-
+@if (gps != null)
+{
     <MapView Class="map-view"
-             Zoom="7.5"
-             Style="width:100%; height:100vh">
+             Zoom="14"
+             Longitude="@gps.Longitude"
+             Latitude="@gps.Latitude"
+             Style="height:60vh"
+             @ref="_mapView"
+             OnClick="OnPointerMoveOrDown">
         <WebMap>
-        <PortalItem Id="395a872338aa4767a66065d17eacbc26" />
-            @if (gps != null)
-            {
-                <GraphicsLayer>
-                        <Graphic>
-                            <PictureMarkerSymbol Url="https://img.icons8.com/ios-filled/50/visit.png" Width="32" Height="32" />
-                            <Point Longitude="@gps.Longitude" Latitude="@gps.Latitude" />
-                        </Graphic>
-                </GraphicsLayer>
-            }
+            <PortalItem Id="395a872338aa4767a66065d17eacbc26" />
+            <GraphicsLayer>
+
+                <Graphic>
+                    <PictureMarkerSymbol Url="https://img.icons8.com/color/48/000000/marker--v1.png" Width="30" Height="30" />
+                    <Point Longitude="@gps.Longitude" Latitude="@gps.Latitude" />
+                </Graphic>
+
+                @if (CellInforList != null)
+                {
+                    foreach (var cell in CellInforList)
+                    {
+                        if (cell.GetLat().HasValue && cell.GetLon().HasValue)
+                        {
+                            <Graphic Attributes="@(new AttributesDictionary(new Dictionary<string, object>
+                                     {
+                                         { "cid", cell.GetCid()}
+                                     }))">
+                                >
+                                <PictureMarkerSymbol 
+                                    Url="@SetImage(cell.Active)" 
+                                    Width="30" 
+                                    Height="30"/>
+                                <Point Longitude="@cell.GetLon()" Latitude="@cell.GetLat()" />
+                            </Graphic>
+                        }
+                    }
+                }
+            </GraphicsLayer>
         </WebMap>
         <ScaleBarWidget Position="OverlayPosition.BottomLeft" />
         <LegendWidget Position="OverlayPosition.TopRight" />
     </MapView>
+    if(BTS != null)
+    {
+        <BTSInfo BTS="@BTS" />
+    }
+}
 
+<style>
+    .esri-view-user-storage {
+        display: none;
+    }
+</style>
 
 @code {
+    private MapView _mapView;
+    private bool _evaluatingPointer;
+
     private List<CellInfor> CellInforList = null;
     private GPS gps = null;
+
+    private CellInfor BTS = null;
 
     protected override async void OnInitialized()
     {
 #if ANDROID
+
     var CellService = new BaseStation.CellInformationService();
     CellInforList = await CellService.GetCellInfos();
     gps = await CellService.GetGPS();
 
     StateHasChanged();
+
 #endif
 
+    }
+
+    private async Task OnPointerMoveOrDown(ClickEvent clickEvent)
+    {
+        if (_evaluatingPointer) return;
+
+        _evaluatingPointer = true;
+        try
+        {
+            HitTestOptions options = new();
+            HitTestResult result = await _mapView!.HitTest(clickEvent, options);
+            Graphic graphic = result.Results.OfType<GraphicHit>().FirstOrDefault().Graphic;
+            if (graphic?.Attributes != null)
+            {
+                graphic.Attributes.TryGetValue("cid", out object _cid);
+                var cid = _cid.ToString();
+                if (!string.IsNullOrEmpty(cid))
+                {
+                    foreach (var cell in CellInforList)
+                    {
+                        if (cell.GetCid() == int.Parse(cid))
+                        {
+                            BTS = cell;
+                            cell.Active = true;
+                        }
+                        else cell.Active = false;
+                    }
+                    StateHasChanged();
+                }
+
+                _evaluatingPointer = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        _evaluatingPointer = false;
+    }
+
+    private string SetImage(bool active)
+    {
+        return active ? "/Images/noun-base-station-4003450-red.svg" : "/Images/noun-base-station-4003450.svg";
     }
 }
 

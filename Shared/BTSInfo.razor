@@ -1,0 +1,27 @@
+﻿@using BaseStation.Models;
+@using System.Dynamic;
+
+@if(address != null)
+{
+    <br>
+    <h3>Thông tin trạm BTS</h3>
+    <p>Kinh độ: @BTS.GetLon()</p>
+    <p>Vĩ độ: @BTS.GetLat()</p>
+}
+
+@code {
+    [Parameter]
+    public CellInfor BTS { get; set; }
+
+    private string address = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new Services.BaseStationServices();
+
+        dynamic CellInfoExtend = await service.GetLocation(BTS);
+        address = CellInfoExtend.address;
+
+        StateHasChanged();
+    }
+}

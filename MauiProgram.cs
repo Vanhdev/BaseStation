@@ -4,6 +4,7 @@ using dymaptic.GeoBlazor.Core;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using Microsoft.Extensions.FileProviders;
+using BaseStation.Services;
 
 namespace BaseStation;
 
@@ -39,6 +40,7 @@ public static class MauiProgram
 
         builder.Services.AddGeoBlazor();
         builder.Services.AddSingleton<WeatherForecastService>();
+        builder.Services.AddSingleton<BaseStationServices>();
         return builder.Build();
 	}
 }

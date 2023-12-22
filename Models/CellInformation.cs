@@ -8,12 +8,13 @@
         private int Cid { get; set; }
         private int Arfcn { get; set; }
         private int Bsic_psc_pci { get; set; }
-        private double Lon { get; set; }
-        private double Lat { get; set; }
+        private double? Lon { get; set; }
+        private double? Lat { get; set; }
         private int AsuLevel { get; set; }
         private int SignalLevel { get; set; }
         private int Dbm { get; set; }
         private String Type { get; set; }
+        public bool Active { get; set; } = false;
         public int GetMcc()
         {
             return Mcc;
@@ -44,7 +45,7 @@
             this.Lac = lac;
         }
 
-        public int getCid()
+        public int GetCid()
         {
             return Cid;
         }
@@ -74,7 +75,7 @@
             this.Bsic_psc_pci = bsic_psc_pci;
         }
 
-        public double GetLon()
+        public double? GetLon()
         {
             return Lon;
         }
@@ -84,7 +85,7 @@
             this.Lon = lon;
         }
 
-        public double GetLat()
+        public double? GetLat()
         {
             return Lat;
         }
@@ -151,5 +152,17 @@
                     ", type='" + Type + '\'' +
                     '}';
         }
+    }
+
+    public class CellInfoExtend
+    {
+        public int? Cid { get; set; }
+        public string status { get; set; }
+        public int? balance { get; set; }
+        public double? lat { get; set; }
+        public double? lon { get; set; }
+        public int? accuracy { get; set; }
+        public string address { get; set; }
+        public string message { get; set; }
     }
 }
